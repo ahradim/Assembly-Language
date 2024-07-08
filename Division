@@ -1,0 +1,112 @@
+.MODEL SMALL
+.STACK 100H
+
+.DATA
+    STR_1 DB "1ST NUM: $"
+    STR_2 DB "2ND NUM: $"
+    RESULT_MSG DB "RESULT: $" 
+    RMNDR DB "REMAINDER: $"
+    
+    ERROR_MSG DB "ERROR: Division by zero.$"
+
+.CODE
+MAIN PROC
+    MOV AX, @DATA
+    MOV DS, AX
+
+    ; Prompt for first number
+    LEA DX, STR_1
+    MOV AH, 9
+    INT 21H
+
+    ; Read first number
+    MOV AH, 1
+    INT 21H
+    SUB AL, '0'  ; Convert ASCII to integer
+    MOV BL, AL
+
+    ; Print newline
+    MOV AH, 2
+    MOV DL, 0DH
+    INT 21H
+    MOV DL, 0AH
+    INT 21H
+
+    ; Prompt for second number
+    LEA DX, STR_2
+    MOV AH, 9
+    INT 21H
+
+    ; Read second number
+    MOV AH, 1
+    INT 21H
+    SUB AL, '0'  ; Convert ASCII to integer
+    MOV BH, AL
+
+    ; Print newline
+    MOV AH, 2
+    MOV DL, 0DH
+    INT 21H
+    MOV DL, 0AH
+    INT 21H
+
+    ; Check for division by zero
+    CMP BH, 0
+    JE DIVISION_BY_ZERO
+
+    
+
+    ; Display result message
+    LEA DX, RESULT_MSG
+    MOV AH, 9
+    INT 21H   
+    
+    ; Divide BL by BH
+    MOV AL, BL
+    MOV AH, 0   ; Clear AH for division
+    DIV BH      ; AL = quotient, AH = remainder
+
+    ; Convert result to ASCII
+    ADD AL, '0' 
+    
+    MOV BL,AH
+    ADD BL,48
+
+    ; Display result
+    
+    MOV AH, 2 
+    MOV DL, AL
+    INT 21H    
+    
+    ; Print newline
+    MOV AH, 2
+    MOV DL, 0DH
+    INT 21H
+    MOV DL, 0AH
+    INT 21H
+    
+    ; Display result message
+    LEA DX, RMNDR
+    MOV AH, 9
+    INT 21H    
+    
+    MOV AH, 2 
+    MOV DL, BL
+    INT 21H
+
+    ; Exit program
+    MOV AH, 4CH
+    INT 21H
+
+DIVISION_BY_ZERO:
+    ; Display error message
+    LEA DX, ERROR_MSG
+    MOV AH, 9
+    INT 21H
+
+    ; Exit program
+    MOV AH, 4CH
+    INT 21H
+
+MAIN ENDP
+END MAIN
